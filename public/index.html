@@ -32,6 +32,10 @@
 			<button type="submit"><i class="material-icons">send</i></button>
 		</form>
 
+		<button id="dark-mode">
+			<i class="material-icons" id="dark-mode-icon">wb_sunny</i>
+		</button>
+
 		<script>
 			var socket = io('http://localhost:3000');
 			var chat = document.getElementById('chat');
@@ -46,10 +50,12 @@
 
 			function createNewMessage(messageData) {
 				var messageContainer = document.createElement('div');
-				messageContainer.className = "message-container";
+				messageContainer.className = 'message-container';
 
 				var usernameTag = document.createElement('strong');
-				var messageTag = document.createTextNode(`: ${messageData.message}`);
+				var messageTag = document.createTextNode(
+					`: ${messageData.message}`
+				);
 				var messagesContainer = document.getElementsByClassName(
 					'messages'
 				);
@@ -75,7 +81,7 @@
 					};
 					socket.emit('sendMessage', messageObject);
 
-					document.getElementById('message').value = "";
+					document.getElementById('message').value = '';
 					createNewMessage(messageObject);
 
 					localStorage.setItem('lastUsername', author);
@@ -88,9 +94,42 @@
 
 			socket.on('pastMessage', (data) => {
 				var pastMessages = data;
-				data.map(eachMessage => {
+				data.map((eachMessage) => {
 					createNewMessage(eachMessage);
 				});
+			});
+		</script>
+		<script>
+			var darkModeActive = null;
+			var darkModeStorage = localStorage.getItem('darkMode');
+
+			if (darkModeStorage) {
+				darkModeActive = darkModeStorage;
+			} else {
+				localStorage.setItem('darkMode', false);
+				darkModeActive = localStorage.getItem('darkMode');
+			}
+
+			function handleChange() {
+				if (darkModeActive === true) {
+					var root = document.documentElement;
+					root.style.setProperty('--background-color', '#121212');
+					root.style.setProperty('--border-color', '#555');
+					root.style.setProperty('--accent-color', '#FFF');
+				} else if (darkModeActive === false) {
+					var root = document.documentElement;
+					root.style.setProperty('--background-color', '#FFF');
+					root.style.setProperty('--border-color', '#DDD');
+					root.style.setProperty('--accent-color', '#000');
+				}
+			}
+
+			var darkModeButton = document.getElementById('dark-mode');
+			darkModeButton.addEventListener('click', (e) => {
+				darkModeActive = !darkModeActive;
+
+				localStorage.setItem('darkMode', darkModeActive);
+				handleChange();
 			});
 		</script>
 	</body>
